@@ -3,6 +3,8 @@
 ONLY_RELATIVE=
 ONLY_NON_RELATIVE=
 
+GREP=$(which -a grep | tail -1 | awk '{ print $1 }')
+
 usage()
 {
 cat << EOF
@@ -45,14 +47,14 @@ done
 GREP_PATH=${1:-./}
 REFERENCE_FILTER="require(['\"]\."
 
-RESULTS=$(/bin/grep -rhoiI "require(['\"][^'\"]\+['\"])" $GREP_PATH)
+RESULTS=$($GREP -rhoiI "require(['\"][^'\"]\+['\"])" $GREP_PATH)
 
 if [ $ONLY_RELATIVE ]
 then
-    RESULTS=$(echo "$RESULTS" | /bin/grep "$REFERENCE_FILTER")
+    RESULTS=$(echo "$RESULTS" | $GREP "$REFERENCE_FILTER")
 elif [ $ONLY_NON_RELATIVE ]
 then
-    RESULTS=$(echo "$RESULTS" | /bin/grep -v "$REFERENCE_FILTER")
+    RESULTS=$(echo "$RESULTS" | $GREP -v "$REFERENCE_FILTER")
 fi
 
 echo "$RESULTS" \
