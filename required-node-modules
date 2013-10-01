@@ -1,0 +1,61 @@
+#!/bin/sh
+
+ONLY_RELATIVE=
+ONLY_NON_RELATIVE=
+
+usage()
+{
+cat << EOF
+
+    Usage: $0 options [path...]
+
+    Find the required CommonJS modules in the given path(s) (defaulting to the current directory).
+
+    OPTIONS:
+
+      -h    Show this message
+      -l    Show only relatively referenced modules
+      -L    Show only global or search-path referenced modules
+
+EOF
+}
+
+while getopts "hlL" OPTION
+do
+    case $OPTION in
+        h)
+            usage
+            exit 1
+            ;;
+        l)
+            ONLY_RELATIVE=1
+            shift
+            ;;
+        L)
+            ONLY_NON_RELATIVE=1
+            shift
+            ;;
+        ?)
+            usage
+            exit 2
+            ;;
+    esac
+done
+
+GREP_PATH=${1:-./}
+REFERENCE_FILTER="require(['\"]\."
+
+RESULTS=$(/bin/grep -rhoiI "require(['\"][^'\"]\+['\"])" $GREP_PATH)
+
+if [ $ONLY_RELATIVE ]
+then
+    RESULTS=$(echo "$RESULTS" | /bin/grep "$REFERENCE_FILTER")
+elif [ $ONLY_NON_RELATIVE ]
+then
+    RESULTS=$(echo "$RESULTS" | /bin/grep -v "$REFERENCE_FILTER")
+fi
+
+echo "$RESULTS" \
+    | sed -e s/require\([\'\"]// -e s/[\'\"]\)// \
+    | sort \
+    | uniq
