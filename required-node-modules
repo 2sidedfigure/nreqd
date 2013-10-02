@@ -1,5 +1,7 @@
 #!/bin/sh
 
+VERSION=0.0.1
+
 ONLY_RELATIVE=
 ONLY_NON_RELATIVE=
 
@@ -16,17 +18,22 @@ cat << EOF
     OPTIONS:
 
       -h    Show this message
+      -V    Show version
       -l    Show only relatively referenced modules
       -L    Show only global or search-path referenced modules
 
 EOF
 }
 
-while getopts "hlL" OPTION
+while getopts "hVlL" OPTION
 do
     case $OPTION in
         h)
             usage
+            exit 1
+            ;;
+        V)
+            echo "version $VERSION"
             exit 1
             ;;
         l)

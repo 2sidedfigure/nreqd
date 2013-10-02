@@ -1,5 +1,7 @@
 # required-node-modules
 
+*v0.0.1*
+
 Find the required CommonJS modules in the given path(s).
 
 ## Usage
@@ -14,7 +16,8 @@ files will be examined.
 
 ### Options
 
-  - **h**: Display usage.
+  - **h**: Show usage.
+  - **V**: Show version.
   - **l**: Show only relatively referenced modules.
   - **L**: Show only global or search-path referenced modules
 
