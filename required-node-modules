@@ -45,19 +45,23 @@ do
 done
 
 GREP_PATH=${1:-./}
-REFERENCE_FILTER="require(['\"]\."
 
-RESULTS=$($GREP -rhoiI "require(['\"][^'\"]\+['\"])" $GREP_PATH)
+BEGIN_AWK='BEGIN { FS=":" }'
+RELATIVE_AWK_MATCH='$2 ~ /^\./ { cmd="fp=$(dirname "$1")/"$2"; echo $(cd \"$(dirname $fp)\"; pwd)/$(basename $fp)"; system(cmd) }'
+NON_RELATIVE_AWK_MATCH='$2 ~ /^[^.]/ { print $2 }'
+
+RESULTS=$($GREP -rHoiI "require(['\"][^'\"]\+['\"])" $GREP_PATH | sed -e s/require\([\'\"]// -e s/[\'\"]\)//)
 
 if [ $ONLY_RELATIVE ]
 then
-    RESULTS=$(echo "$RESULTS" | $GREP "$REFERENCE_FILTER")
+    RESULTS=$(echo "$RESULTS" | awk "$BEGIN_AWK $RELATIVE_AWK_MATCH")
 elif [ $ONLY_NON_RELATIVE ]
 then
-    RESULTS=$(echo "$RESULTS" | $GREP -v "$REFERENCE_FILTER")
+    RESULTS=$(echo "$RESULTS" | awk "$BEGIN_AWK $NON_RELATIVE_AWK_MATCH")
+else
+    RESULTS=$(echo "$RESULTS" | awk "$BEGIN_AWK $RELATIVE_AWK_MATCH $NON_RELATIVE_AWK_MATCH")
 fi
 
 echo "$RESULTS" \
-    | sed -e s/require\([\'\"]// -e s/[\'\"]\)// \
     | sort \
     | uniq
