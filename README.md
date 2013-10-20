@@ -1,4 +1,4 @@
-# required-node-modules
+# nreqd
 
 *v0.0.1*
 
@@ -7,7 +7,7 @@ Find the required CommonJS modules in the given path(s).
 ## Usage
 
 ```sh
-./required-node-modules options [path...]
+./nreqd options [path...]
 ```
 
 One or more paths may be supplied to search recursively. If no path is
